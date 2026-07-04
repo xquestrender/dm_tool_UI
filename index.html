@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>x_dm_tool 設定</title>
 <style>
-/* ===== ベース ===== */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#fff;--bg2:#f5f5f7;--bg3:#e8e8ed;
@@ -18,14 +17,41 @@
 }
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
 html,body{height:100%;overflow-x:hidden}
-body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:16px;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)}
+body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:16px}
 
-/* ===== タブバー（底部固定） ===== */
+/* ===== ログイン画面 ===== */
+#login-screen{
+  position:fixed;inset:0;background:var(--bg2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 24px;z-index:200;
+}
+#login-screen h1{font-size:20px;font-weight:700;margin-bottom:8px;color:var(--text)}
+#login-screen p{font-size:13px;color:var(--text3);margin-bottom:32px}
+.login-card{background:var(--bg);border-radius:var(--radius);padding:24px;width:100%;max-width:340px}
+.login-card label{font-size:13px;font-weight:500;color:var(--text2);display:block;margin-bottom:6px}
+.login-card input{
+  width:100%;padding:12px 14px;font-size:16px;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg2);color:var(--text);font-family:var(--font);
+  -webkit-appearance:none;margin-bottom:8px;
+}
+.login-card input:focus{outline:none;border-color:var(--accent);background:var(--bg)}
+.login-card input.err{border-color:var(--danger);background:var(--danger-bg)}
+.login-err{font-size:12px;color:var(--danger);min-height:18px;margin-bottom:12px}
+.login-btn{
+  width:100%;padding:14px;font-size:16px;font-weight:600;
+  border:none;border-radius:var(--radius-sm);
+  background:var(--accent);color:#fff;cursor:pointer;font-family:var(--font);
+  -webkit-appearance:none;
+}
+.login-btn:active{opacity:.8}
+.login-btn:disabled{opacity:.4}
+
+/* ===== タブバー ===== */
 .tabs{
   display:flex;position:fixed;bottom:0;left:0;right:0;
   height:calc(var(--tab-h) + env(safe-area-inset-bottom));
-  background:rgba(255,255,255,.92);
-  border-top:1px solid var(--border);
+  background:rgba(255,255,255,.92);border-top:1px solid var(--border);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   z-index:50;padding-bottom:env(safe-area-inset-bottom);
 }
@@ -40,8 +66,6 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 /* ===== パネル ===== */
 .panel{display:none;padding:12px 16px;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 16px)}
 .panel.active{display:block}
-
-/* ===== ページ見出し ===== */
 .page-title{font-size:22px;font-weight:700;color:var(--text);margin:8px 0 16px 2px}
 
 /* ===== カード ===== */
@@ -59,8 +83,8 @@ body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:1
 .hbtn{
   width:20px;height:20px;border-radius:50%;
   border:1.5px solid var(--border2);background:var(--bg2);
-  color:var(--text3);font-size:11px;cursor:pointer;
-  flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
+  color:var(--text3);font-size:11px;cursor:pointer;flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
   font-family:var(--font);font-weight:600;padding:0;
 }
 .hbtn:active{background:var(--bg3)}
@@ -116,9 +140,8 @@ textarea.err{border-color:var(--danger);background:var(--danger-bg)}
 /* ===== 保存ボタン ===== */
 .save-btn{
   display:block;width:100%;padding:15px;font-size:17px;font-weight:600;
-  border:none;border-radius:var(--radius);
-  background:var(--accent);color:#fff;cursor:pointer;
-  margin-top:16px;font-family:var(--font);letter-spacing:.01em;
+  border:none;border-radius:var(--radius);background:var(--accent);color:#fff;
+  cursor:pointer;margin-top:16px;font-family:var(--font);letter-spacing:.01em;
   -webkit-appearance:none;
 }
 .save-btn:active{opacity:.8}
@@ -141,23 +164,33 @@ textarea.err{border-color:var(--danger);background:var(--danger-bg)}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #loading p{font-size:14px;color:var(--text3)}
-
-/* ===== GAS URL未設定バナー ===== */
-#url-banner{display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:var(--radius-sm);padding:12px 14px;margin:12px 16px;font-size:13px;color:#856404;line-height:1.5}
 </style>
 </head>
 <body>
 
-<!-- ▼ GAS WebApp URLをここに設定 -->
 <script>
-var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2TRsTejYTmMaDz2jSpX4aPFwnHc_L_nbGY9DaHqmvOZf/exec';
+var GAS_URL = '__GAS_URL__';  // GitHub Actionsが置換
 </script>
 
-<div id="loading"><div class="spinner"></div><p>読み込み中…</p></div>
+<!-- ===== ログイン画面 ===== -->
+<div id="login-screen">
+  <h1>x_dm_tool 設定</h1>
+  <p>パスワードを入力してください</p>
+  <div class="login-card">
+    <label for="pw-input">パスワード</label>
+    <input type="password" id="pw-input" autocomplete="current-password"
+           onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-err" id="login-err"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">ログイン</button>
+  </div>
+</div>
 
-<!-- ヘルプ モーダル -->
+<!-- ===== ローディング ===== -->
+<div id="loading" style="display:none"><div class="spinner"></div><p>読み込み中…</p></div>
+
+<!-- ===== ヘルプモーダル ===== -->
 <div class="pop-overlay" id="pop-overlay" onclick="closePop(event)">
-  <div class="pop-sheet" id="pop-sheet">
+  <div class="pop-sheet">
     <button class="pop-close" onclick="closePop()">✕</button>
     <h3 id="pop-title"></h3>
     <p id="pop-body"></p>
@@ -165,10 +198,8 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2T
 </div>
 
 <!-- ========== 設定パネル ========== -->
-<div id="panel-settings" class="panel active" style="display:none">
-  <div id="url-banner">⚠️ GAS_URL が設定されていません。index.html 冒頭の GAS_URL を編集してください。</div>
+<div id="panel-settings" class="panel" style="display:none">
   <div class="page-title">設定</div>
-
   <div class="card">
     <div class="card-sec">基本設定</div>
     <div class="row">
@@ -216,7 +247,6 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2T
       </div>
     </div>
   </div>
-
   <div class="card">
     <div class="card-sec">QR用URL（DMQR）</div>
     <div class="row">
@@ -235,7 +265,6 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2T
       <input type="text" id="qr3" placeholder="インスタグラム登録：https://instagram.com/xxx">
     </div>
   </div>
-
   <button class="save-btn" onclick="saveSettings()">保存</button>
 </div>
 
@@ -286,7 +315,6 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2T
 <!-- ========== DMパネル ========== -->
 <div id="panel-dm" class="panel" style="display:none">
   <div class="page-title">DM</div>
-
   <div class="card">
     <div class="card-sec">DM本文（バリエーション）</div>
     <div class="row">
@@ -321,7 +349,6 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2T
       <div class="ferr" id="e-dm3"></div>
     </div>
   </div>
-
   <div class="card">
     <div class="card-sec">ヘッダー（3種）</div>
     <div class="row">
@@ -343,7 +370,6 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2T
       <div class="ferr" id="e-hdr3"></div>
     </div>
   </div>
-
   <div class="card">
     <div class="card-sec">フッター（3種）</div>
     <div class="row">
@@ -365,28 +391,24 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2T
       <div class="ferr" id="e-ftr3"></div>
     </div>
   </div>
-
   <button class="save-btn" onclick="saveDM()">保存</button>
 </div>
 
 <!-- ========== タブバー ========== -->
 <nav class="tabs" id="tabs" style="display:none">
-  <button class="tab active" onclick="switchTab('settings',this)">
-    <span class="ico">⚙️</span>設定
-  </button>
-  <button class="tab" onclick="switchTab('posts',this)">
-    <span class="ico">✉️</span>ポスト
-  </button>
-  <button class="tab" onclick="switchTab('dm',this)">
-    <span class="ico">💬</span>DM
-  </button>
+  <button class="tab active" onclick="switchTab('settings',this)"><span class="ico">⚙️</span>設定</button>
+  <button class="tab" onclick="switchTab('posts',this)"><span class="ico">✉️</span>ポスト</button>
+  <button class="tab" onclick="switchTab('dm',this)"><span class="ico">💬</span>DM</button>
 </nav>
 
 <div class="toast tok" id="t-ok"></div>
 <div class="toast tng" id="t-ng"></div>
 
 <script>
-// ===== キーマッピング =====
+// ===== 状態 =====
+var _pw      = '';
+var _helpData = {};
+
 var KEY_MAP = {
   '対象ポストURL'    : 'postUrl',
   '応募キーワード'   : 'keyword',
@@ -409,30 +431,48 @@ var KEY_MAP = {
   'ＤＭフッター３'   : 'ftr3',
 };
 
-var _helpData = {};
+// ===== ログイン =====
+function doLogin() {
+  var pw  = document.getElementById('pw-input').value.trim();
+  var err = document.getElementById('login-err');
+  var btn = document.getElementById('login-btn');
+  if (!pw) { err.textContent = 'パスワードを入力してください'; return; }
+  btn.disabled = true;
+  err.textContent = '';
+  fetch(GAS_URL + '?action=auth&pw=' + encodeURIComponent(pw))
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if (res.ok) {
+        _pw = pw;
+        document.getElementById('login-screen').style.display = 'none';
+        loadData();
+      } else {
+        err.textContent = res.message || 'パスワードが違います';
+        document.getElementById('pw-input').classList.add('err');
+        btn.disabled = false;
+      }
+    })
+    .catch(function(e){
+      err.textContent = '通信エラー: ' + e.message;
+      btn.disabled = false;
+    });
+}
 
-// ===== 初期化 =====
-window.addEventListener('load', function() {
-  // GAS_URL未設定チェック
-  if (!GAS_URL || GAS_URL.indexOf('ここに') !== -1) {
-    document.getElementById('url-banner').style.display = 'block';
-    hideLoading();
-    return;
-  }
-  fetch(GAS_URL)
+// ===== データ読み込み =====
+function loadData() {
+  document.getElementById('loading').style.display = 'flex';
+  fetch(GAS_URL + '?action=load&pw=' + encodeURIComponent(_pw))
     .then(function(r){ return r.json(); })
     .then(function(res){
       if (res.ok) onLoaded(res.data);
       else { showNg('読み込み失敗: ' + res.message); hideLoading(); }
     })
     .catch(function(e){ showNg('通信エラー: ' + e.message); hideLoading(); });
-});
+}
 
 function onLoaded(data) {
   var vals = data.values || {};
-  var help = data.help  || {};
-  _helpData = help;
-
+  _helpData = data.help || {};
   Object.keys(KEY_MAP).forEach(function(key) {
     var fid = KEY_MAP[key];
     var val = vals[key] !== undefined ? vals[key] : '';
@@ -463,19 +503,17 @@ function setVal(id, val) {
 // ===== タブ切替 =====
 function switchTab(name, btn) {
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-  document.querySelectorAll('.panel').forEach(function(p){ p.style.display = 'none'; p.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.style.display='none'; p.classList.remove('active'); });
   btn.classList.add('active');
   var panel = document.getElementById('panel-' + name);
-  panel.style.display = 'block';
-  panel.classList.add('active');
+  panel.style.display = 'block'; panel.classList.add('active');
   window.scrollTo(0, 0);
 }
 
-// ===== ヘルプモーダル =====
+// ===== ヘルプ =====
 function openPop(label, helpKey) {
-  var text = _helpData[helpKey] || _helpData[label] || '';
   document.getElementById('pop-title').textContent = label;
-  document.getElementById('pop-body').textContent  = text || '説明がありません';
+  document.getElementById('pop-body').textContent  = _helpData[helpKey] || '説明がありません';
   document.getElementById('pop-overlay').classList.add('show');
 }
 function closePop(e) {
@@ -485,163 +523,123 @@ function closePop(e) {
 
 // ===== URL検知 =====
 var URL_PAT = [
-  /https?:\/\//i,
-  /ttp:\/\//i,
+  /https?:\/\//i, /ttp:\/\//i,
   /[a-zA-Z0-9\-]+\.(com|net|org|jp|io|co|me|link|ly|app|tv|gg|xyz|club|site|online|shop|info|biz|us|uk|de|fr|au|ca|in|ru)(\/[^\s　]*)?(?=[\s　,、。）\)」』\n]|$)/i,
   /bit\.ly|t\.co|youtu\.be|lin\.ee|liff\.line\.me|tinyurl|ow\.ly/i,
 ];
 function detectUrl(text) {
-  for (var i = 0; i < URL_PAT.length; i++) {
-    var m = text.match(URL_PAT[i]);
-    if (m) return m[0];
-  }
+  for (var i=0;i<URL_PAT.length;i++){var m=text.match(URL_PAT[i]);if(m)return m[0];}
   return null;
 }
 
 // ===== バリデーション =====
-function liveTA(el, eid) {
-  var hit = detectUrl(el.value);
-  if (hit)                   markErr(el, eid, 'URLが含まれています：「' + hit + '」');
-  else if (!el.value.trim()) markErr(el, eid, '入力してください');
-  else                       clearErr(el, eid);
+function liveTA(el,eid){
+  var hit=detectUrl(el.value);
+  if(hit) markErr(el,eid,'URLが含まれています：「'+hit+'」');
+  else if(!el.value.trim()) markErr(el,eid,'入力してください');
+  else clearErr(el,eid);
 }
-function liveIn(el, eid) { liveTA(el, eid); }
-
-function markErr(el, eid, msg) {
+function liveIn(el,eid){liveTA(el,eid);}
+function markErr(el,eid,msg){
   el.classList.add('err');
-  var e = document.getElementById(eid);
-  if (e) { e.textContent = msg; e.classList.add('show'); }
+  var e=document.getElementById(eid);
+  if(e){e.textContent=msg;e.classList.add('show');}
 }
-function clearErr(el, eid) {
-  if (el.value.trim()) {
+function clearErr(el,eid){
+  if(el.value.trim()){
     el.classList.remove('err');
-    var e = document.getElementById(eid);
-    if (e) e.classList.remove('show');
+    var e=document.getElementById(eid);if(e)e.classList.remove('show');
   }
 }
-function validateRequired(specs) {
-  var ok = true;
-  specs.forEach(function(s) {
-    var el = document.getElementById(s.id);
-    if (!el) return;
-    if (!el.value.trim()) { markErr(el, s.eid, '入力してください'); ok = false; }
+function validateRequired(specs){
+  var ok=true;
+  specs.forEach(function(s){
+    var el=document.getElementById(s.id);if(!el)return;
+    if(!el.value.trim()){markErr(el,s.eid,'入力してください');ok=false;}
   });
   return ok;
 }
-function validateNoUrl(ids) {
-  var first = null;
-  ids.forEach(function(id) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    var hit = detectUrl(el.value);
-    if (hit) {
-      markErr(el, 'e-' + id, 'URLが含まれています：「' + hit + '」');
-      if (!first) first = id;
-    }
+function validateNoUrl(ids){
+  var first=null;
+  ids.forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    var hit=detectUrl(el.value);
+    if(hit){markErr(el,'e-'+id,'URLが含まれています：「'+hit+'」');if(!first)first=id;}
   });
   return first;
 }
 
 // ===== コピー =====
-function copyFrom(srcId, dstId, eid) {
-  var dst = document.getElementById(dstId);
-  dst.value = document.getElementById(srcId).value;
-  liveTA(dst, eid);
-  showOk('コピーしました');
+function copyFrom(srcId,dstId,eid){
+  var dst=document.getElementById(dstId);
+  dst.value=document.getElementById(srcId).value;
+  liveTA(dst,eid);showOk('コピーしました');
 }
 
 // ===== トースト =====
-function showOk(msg) { toast('t-ok', msg); }
-function showNg(msg) { toast('t-ng', msg); }
-function toast(id, msg) {
-  var t = document.getElementById(id);
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, id === 't-ng' ? 2800 : 1800);
+function showOk(msg){toast('t-ok',msg);}
+function showNg(msg){toast('t-ng',msg);}
+function toast(id,msg){
+  var t=document.getElementById(id);
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},id==='t-ng'?2800:1800);
 }
+function v(id){var el=document.getElementById(id);return el?el.value:'';}
 
-function v(id) { var el = document.getElementById(id); return el ? el.value : ''; }
-
-// ===== GASへ保存（fetch POST） =====
-function runSave(updates, label) {
-  var btns = document.querySelectorAll('.save-btn');
-  btns.forEach(function(b){ b.disabled = true; });
-
-  fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' }, // GASはapplication/jsonをリジェクトする場合があるためtext/plain
-    body: JSON.stringify({ updates: updates })
+// ===== GASへ保存 =====
+function runSave(updates,label){
+  var btns=document.querySelectorAll('.save-btn');
+  btns.forEach(function(b){b.disabled=true;});
+  fetch(GAS_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({pw:_pw,updates:updates})
   })
-  .then(function(r){ return r.json(); })
+  .then(function(r){return r.json();})
   .then(function(res){
-    btns.forEach(function(b){ b.disabled = false; });
-    if (res.ok) showOk(label + 'を保存しました（' + res.updated.length + '項目）');
-    else showNg('保存失敗: ' + (res.message || '不明なエラー'));
+    btns.forEach(function(b){b.disabled=false;});
+    if(res.ok) showOk(label+'を保存しました（'+res.updated.length+'項目）');
+    else showNg('保存失敗: '+(res.message||'不明なエラー'));
   })
   .catch(function(e){
-    btns.forEach(function(b){ b.disabled = false; });
-    showNg('通信エラー: ' + e.message);
+    btns.forEach(function(b){b.disabled=false;});
+    showNg('通信エラー: '+e.message);
   });
 }
 
-// ===== 各タブの保存処理 =====
-function saveSettings() {
-  var req = [
+function saveSettings(){
+  var req=[
     {id:'postUrl',eid:'e-postUrl'},{id:'keyword',eid:'e-keyword'},
     {id:'winnerCount',eid:'e-winner'},{id:'loserLimit',eid:'e-loser'},{id:'resetHour',eid:'e-reset'},
   ];
-  if (!validateRequired(req)) { showNg('必須項目を入力してください'); return; }
-  var rh = parseInt(v('resetHour'));
-  if (isNaN(rh) || rh < 0 || rh > 23) {
-    markErr(document.getElementById('resetHour'), 'e-reset', '0〜23で入力してください');
-    showNg('リセット時刻は0〜23で入力してください'); return;
-  }
-  var qr = [v('qr1'), v('qr2'), v('qr3')].filter(Boolean).join('\n');
-  runSave({
-    '対象ポストURL'    : v('postUrl'),
-    '応募キーワード'   : v('keyword'),
-    '先着人数'         : v('winnerCount'),
-    '落選リプライ上限' : v('loserLimit'),
-    'リセット時刻'     : v('resetHour'),
-    'DMQR'             : qr,
-  }, '設定');
+  if(!validateRequired(req)){showNg('必須項目を入力してください');return;}
+  var rh=parseInt(v('resetHour'));
+  if(isNaN(rh)||rh<0||rh>23){markErr(document.getElementById('resetHour'),'e-reset','0〜23で入力してください');showNg('リセット時刻は0〜23で入力してください');return;}
+  var qr=[v('qr1'),v('qr2'),v('qr3')].filter(Boolean).join('\n');
+  runSave({'対象ポストURL':v('postUrl'),'応募キーワード':v('keyword'),'先着人数':v('winnerCount'),'落選リプライ上限':v('loserLimit'),'リセット時刻':v('resetHour'),'DMQR':qr},'設定');
 }
 
-function savePosts() {
-  var req = [
+function savePosts(){
+  var req=[
     {id:'winReply',eid:'e-winReply'},{id:'loseReply',eid:'e-loseReply'},
     {id:'endPost',eid:'e-endPost'},{id:'followRequest',eid:'e-followR'},
   ];
-  if (!validateRequired(req)) { showNg('必須項目を入力してください'); return; }
-  var hitId = validateNoUrl(['winReply','loseReply','endPost','followRequest']);
-  if (hitId) { showNg('URLが含まれています — 保存できません'); document.getElementById(hitId).focus(); return; }
-  runSave({
-    '当選リプライ' : v('winReply'),
-    '落選リプライ' : v('loseReply'),
-    '終了ポスト'   : v('endPost'),
-    'フォロー要求' : v('followRequest'),
-  }, 'ポスト設定');
+  if(!validateRequired(req)){showNg('必須項目を入力してください');return;}
+  var hitId=validateNoUrl(['winReply','loseReply','endPost','followRequest']);
+  if(hitId){showNg('URLが含まれています — 保存できません');document.getElementById(hitId).focus();return;}
+  runSave({'当選リプライ':v('winReply'),'落選リプライ':v('loseReply'),'終了ポスト':v('endPost'),'フォロー要求':v('followRequest')},'ポスト設定');
 }
 
-function saveDM() {
-  var reqIds = [
+function saveDM(){
+  var reqIds=[
     {id:'dm1',eid:'e-dm1'},
     {id:'hdr1',eid:'e-hdr1'},{id:'hdr2',eid:'e-hdr2'},{id:'hdr3',eid:'e-hdr3'},
     {id:'ftr1',eid:'e-ftr1'},{id:'ftr2',eid:'e-ftr2'},{id:'ftr3',eid:'e-ftr3'},
   ];
-  if (!validateRequired(reqIds)) { showNg('必須項目を入力してください'); return; }
-  var hitId = validateNoUrl(['dm1','dm2','dm3','hdr1','hdr2','hdr3','ftr1','ftr2','ftr3']);
-  if (hitId) { showNg('URLが含まれています — 保存できません'); document.getElementById(hitId).focus(); return; }
-  runSave({
-    'ＤＭ本文１'     : v('dm1'),
-    'ＤＭ本文２'     : v('dm2'),
-    'ＤＭ本文３'     : v('dm3'),
-    'ＤＭヘッダー１' : v('hdr1'),
-    'ＤＭヘッダー２' : v('hdr2'),
-    'ＤＭヘッダー３' : v('hdr3'),
-    'ＤＭフッター１' : v('ftr1'),
-    'ＤＭフッター２' : v('ftr2'),
-    'ＤＭフッター３' : v('ftr3'),
-  }, 'DM設定');
+  if(!validateRequired(reqIds)){showNg('必須項目を入力してください');return;}
+  var hitId=validateNoUrl(['dm1','dm2','dm3','hdr1','hdr2','hdr3','ftr1','ftr2','ftr3']);
+  if(hitId){showNg('URLが含まれています — 保存できません');document.getElementById(hitId).focus();return;}
+  runSave({'ＤＭ本文１':v('dm1'),'ＤＭ本文２':v('dm2'),'ＤＭ本文３':v('dm3'),'ＤＭヘッダー１':v('hdr1'),'ＤＭヘッダー２':v('hdr2'),'ＤＭヘッダー３':v('hdr3'),'ＤＭフッター１':v('ftr1'),'ＤＭフッター２':v('ftr2'),'ＤＭフッター３':v('ftr3')},'DM設定');
 }
 </script>
 </body>
