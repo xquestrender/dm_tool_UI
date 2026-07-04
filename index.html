@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>x_dm_tool 設定</title>
+<style>
+/* ===== ベース ===== */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#fff;--bg2:#f5f5f7;--bg3:#e8e8ed;
+  --border:#d1d1d6;--border2:#c7c7cc;
+  --text:#1c1c1e;--text2:#3c3c43;--text3:#8e8e93;
+  --danger:#ff3b30;--danger-bg:#fff2f1;
+  --accent:#007aff;--radius:12px;--radius-sm:8px;
+  --font:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+  --tab-h:54px;
+}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:16px;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)}
+
+/* ===== タブバー（底部固定） ===== */
+.tabs{
+  display:flex;position:fixed;bottom:0;left:0;right:0;
+  height:calc(var(--tab-h) + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.92);
+  border-top:1px solid var(--border);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  z-index:50;padding-bottom:env(safe-area-inset-bottom);
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:none;background:none;color:var(--text3);font-size:10px;font-weight:500;
+  cursor:pointer;padding:6px 0 0;font-family:var(--font);
+}
+.tab .ico{font-size:22px;line-height:1}
+.tab.active{color:var(--accent)}
+
+/* ===== パネル ===== */
+.panel{display:none;padding:12px 16px;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 16px)}
+.panel.active{display:block}
+
+/* ===== ページ見出し ===== */
+.page-title{font-size:22px;font-weight:700;color:var(--text);margin:8px 0 16px 2px}
+
+/* ===== カード ===== */
+.card{background:var(--bg);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.card-sec{font-size:13px;font-weight:600;color:var(--text3);padding:14px 16px 6px;letter-spacing:.02em}
+
+/* ===== フィールド行 ===== */
+.row{padding:12px 16px;border-bottom:1px solid var(--bg2);position:relative}
+.row:last-child{border-bottom:none}
+.row-label{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.row-label .lbl{font-size:13px;font-weight:500;color:var(--text2)}
+.req{color:var(--danger);font-size:12px;margin-left:1px}
+
+/* ===== ヘルプボタン ===== */
+.hbtn{
+  width:20px;height:20px;border-radius:50%;
+  border:1.5px solid var(--border2);background:var(--bg2);
+  color:var(--text3);font-size:11px;cursor:pointer;
+  flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--font);font-weight:600;padding:0;
+}
+.hbtn:active{background:var(--bg3)}
+
+/* ===== ヘルプモーダル ===== */
+.pop-overlay{display:none;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.4)}
+.pop-overlay.show{display:flex;align-items:flex-end}
+.pop-sheet{
+  background:var(--bg);border-radius:20px 20px 0 0;
+  padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+  width:100%;max-height:60vh;overflow-y:auto;
+}
+.pop-sheet h3{font-size:15px;font-weight:600;margin-bottom:10px;color:var(--text)}
+.pop-sheet p{font-size:14px;color:var(--text2);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.pop-close{float:right;border:none;background:var(--bg3);border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;margin-top:-4px}
+
+/* ===== input / textarea ===== */
+input[type=text],input[type=number],input[type=url]{
+  width:100%;padding:10px 12px;font-size:16px;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg2);color:var(--text);font-family:var(--font);
+  -webkit-appearance:none;appearance:none;
+}
+input:focus{outline:none;border-color:var(--accent);background:var(--bg)}
+input.err{border-color:var(--danger);background:var(--danger-bg)}
+textarea{
+  width:100%;padding:10px 12px;font-size:15px;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg2);color:var(--text);font-family:var(--font);
+  line-height:1.6;resize:none;-webkit-appearance:none;
+}
+textarea:focus{outline:none;border-color:var(--accent);background:var(--bg)}
+textarea.err{border-color:var(--danger);background:var(--danger-bg)}
+
+/* ===== 3列グリッド ===== */
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+
+/* ===== エラー ===== */
+.ferr{font-size:12px;color:var(--danger);margin-top:5px;display:none;line-height:1.4}
+.ferr.show{display:block}
+
+/* ===== DMグループ ===== */
+.dm-head{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.dm-title{font-size:14px;font-weight:600;color:var(--text2)}
+.dm-btns{margin-left:auto;display:flex;gap:6px}
+.cbtn{
+  font-size:12px;padding:5px 11px;border:1.5px solid var(--accent);
+  border-radius:20px;background:var(--bg);color:var(--accent);
+  cursor:pointer;font-family:var(--font);font-weight:500;white-space:nowrap;
+}
+.cbtn:active{background:var(--accent);color:#fff}
+
+/* ===== 保存ボタン ===== */
+.save-btn{
+  display:block;width:100%;padding:15px;font-size:17px;font-weight:600;
+  border:none;border-radius:var(--radius);
+  background:var(--accent);color:#fff;cursor:pointer;
+  margin-top:16px;font-family:var(--font);letter-spacing:.01em;
+  -webkit-appearance:none;
+}
+.save-btn:active{opacity:.8}
+.save-btn:disabled{opacity:.4;cursor:default}
+
+/* ===== トースト ===== */
+.toast{
+  position:fixed;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 12px);
+  left:50%;transform:translateX(-50%);
+  font-size:14px;font-weight:500;padding:10px 20px;
+  border-radius:24px;opacity:0;transition:opacity .2s;
+  pointer-events:none;z-index:99;white-space:nowrap;max-width:88vw;text-align:center;
+}
+.tok{background:#1c1c1e;color:#fff}
+.tng{background:#ff3b30;color:#fff}
+.toast.show{opacity:1}
+
+/* ===== ローディング ===== */
+#loading{position:fixed;inset:0;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:14px}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading p{font-size:14px;color:var(--text3)}
+
+/* ===== GAS URL未設定バナー ===== */
+#url-banner{display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:var(--radius-sm);padding:12px 14px;margin:12px 16px;font-size:13px;color:#856404;line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- ▼ GAS WebApp URLをここに設定 -->
+<script>
+var GAS_URL = 'https://script.google.com/macros/s/AKfycby4fcu2eiZWomrNLyuyQtuE2TRsTejYTmMaDz2jSpX4aPFwnHc_L_nbGY9DaHqmvOZf/exec';
+</script>
+
+<div id="loading"><div class="spinner"></div><p>読み込み中…</p></div>
+
+<!-- ヘルプ モーダル -->
+<div class="pop-overlay" id="pop-overlay" onclick="closePop(event)">
+  <div class="pop-sheet" id="pop-sheet">
+    <button class="pop-close" onclick="closePop()">✕</button>
+    <h3 id="pop-title"></h3>
+    <p id="pop-body"></p>
+  </div>
+</div>
+
+<!-- ========== 設定パネル ========== -->
+<div id="panel-settings" class="panel active" style="display:none">
+  <div id="url-banner">⚠️ GAS_URL が設定されていません。index.html 冒頭の GAS_URL を編集してください。</div>
+  <div class="page-title">設定</div>
+
+  <div class="card">
+    <div class="card-sec">基本設定</div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">対象ポストURL<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('対象ポストURL','対象ポストURL')">?</button>
+      </div>
+      <input type="url" id="postUrl" placeholder="https://x.com/xxxx/status/…" oninput="clearErr(this,'e-postUrl')">
+      <div class="ferr" id="e-postUrl">入力してください</div>
+    </div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">応募キーワード<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('応募キーワード','応募キーワード')">?</button>
+      </div>
+      <input type="text" id="keyword" oninput="clearErr(this,'e-keyword')">
+      <div class="ferr" id="e-keyword">入力してください</div>
+    </div>
+    <div class="row">
+      <div class="row3">
+        <div>
+          <div class="row-label">
+            <span class="lbl" style="font-size:12px">先着人数<span class="req">*</span></span>
+            <button class="hbtn" onclick="openPop('先着人数','先着人数')" style="width:17px;height:17px;font-size:10px">?</button>
+          </div>
+          <input type="number" id="winnerCount" min="1" oninput="clearErr(this,'e-winner')">
+          <div class="ferr" id="e-winner">必須</div>
+        </div>
+        <div>
+          <div class="row-label">
+            <span class="lbl" style="font-size:12px">落選上限<span class="req">*</span></span>
+            <button class="hbtn" onclick="openPop('落選上限','落選リプライ上限')" style="width:17px;height:17px;font-size:10px">?</button>
+          </div>
+          <input type="number" id="loserLimit" min="0" oninput="clearErr(this,'e-loser')">
+          <div class="ferr" id="e-loser">必須</div>
+        </div>
+        <div>
+          <div class="row-label">
+            <span class="lbl" style="font-size:12px">リセット時刻<span class="req">*</span></span>
+            <button class="hbtn" onclick="openPop('リセット時刻','リセット時刻')" style="width:17px;height:17px;font-size:10px">?</button>
+          </div>
+          <input type="number" id="resetHour" min="0" max="23" oninput="clearErr(this,'e-reset')">
+          <div class="ferr" id="e-reset">0〜23</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-sec">QR用URL（DMQR）</div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">URL 1</span>
+        <button class="hbtn" onclick="openPop('DMQR','DMQR')">?</button>
+      </div>
+      <input type="text" id="qr1" placeholder="特典動画：https://youtu.be/xxx">
+    </div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">URL 2</span></div>
+      <input type="text" id="qr2" placeholder="LINE登録：https://line.me/xxx">
+    </div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">URL 3</span></div>
+      <input type="text" id="qr3" placeholder="インスタグラム登録：https://instagram.com/xxx">
+    </div>
+  </div>
+
+  <button class="save-btn" onclick="saveSettings()">保存</button>
+</div>
+
+<!-- ========== ポストパネル ========== -->
+<div id="panel-posts" class="panel" style="display:none">
+  <div class="page-title">ポスト</div>
+  <div class="card">
+    <div class="card-sec">リプライ</div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">当選リプライ<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('当選リプライ','当選リプライ')">?</button>
+      </div>
+      <textarea id="winReply" rows="4" oninput="liveTA(this,'e-winReply')"></textarea>
+      <div class="ferr" id="e-winReply"></div>
+    </div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">落選リプライ<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('落選リプライ','落選リプライ')">?</button>
+      </div>
+      <textarea id="loseReply" rows="5" oninput="liveTA(this,'e-loseReply')"></textarea>
+      <div class="ferr" id="e-loseReply"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-sec">ポスト・フォロー</div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">終了ポスト<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('終了ポスト','終了ポスト')">?</button>
+      </div>
+      <textarea id="endPost" rows="5" oninput="liveTA(this,'e-endPost')"></textarea>
+      <div class="ferr" id="e-endPost"></div>
+    </div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">フォロー要求リプライ<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('フォロー要求リプライ','フォロー要求')">?</button>
+      </div>
+      <textarea id="followRequest" rows="2" oninput="liveTA(this,'e-followR')"></textarea>
+      <div class="ferr" id="e-followR"></div>
+    </div>
+  </div>
+  <button class="save-btn" onclick="savePosts()">保存</button>
+</div>
+
+<!-- ========== DMパネル ========== -->
+<div id="panel-dm" class="panel" style="display:none">
+  <div class="page-title">DM</div>
+
+  <div class="card">
+    <div class="card-sec">DM本文（バリエーション）</div>
+    <div class="row">
+      <div class="dm-head">
+        <span class="dm-title">ＤＭ本文１<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('ＤＭ本文１','ＤＭ本文１')">?</button>
+      </div>
+      <textarea id="dm1" rows="7" oninput="liveTA(this,'e-dm1')"></textarea>
+      <div class="ferr" id="e-dm1"></div>
+    </div>
+    <div class="row">
+      <div class="dm-head">
+        <span class="dm-title">ＤＭ本文２</span>
+        <button class="hbtn" onclick="openPop('ＤＭ本文２','ＤＭ本文２')">?</button>
+        <div class="dm-btns">
+          <button class="cbtn" onclick="copyFrom('dm1','dm2','e-dm2')">１からコピー</button>
+        </div>
+      </div>
+      <textarea id="dm2" rows="7" oninput="liveTA(this,'e-dm2')"></textarea>
+      <div class="ferr" id="e-dm2"></div>
+    </div>
+    <div class="row">
+      <div class="dm-head">
+        <span class="dm-title">ＤＭ本文３</span>
+        <button class="hbtn" onclick="openPop('ＤＭ本文３','ＤＭ本文３')">?</button>
+        <div class="dm-btns">
+          <button class="cbtn" onclick="copyFrom('dm1','dm3','e-dm3')">１からコピー</button>
+          <button class="cbtn" onclick="copyFrom('dm2','dm3','e-dm3')">２からコピー</button>
+        </div>
+      </div>
+      <textarea id="dm3" rows="7" oninput="liveTA(this,'e-dm3')"></textarea>
+      <div class="ferr" id="e-dm3"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-sec">ヘッダー（3種）</div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">ＤＭヘッダー１<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('ＤＭヘッダー１','ＤＭヘッダー１')">?</button>
+      </div>
+      <input type="text" id="hdr1" oninput="liveIn(this,'e-hdr1')">
+      <div class="ferr" id="e-hdr1"></div>
+    </div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">ＤＭヘッダー２<span class="req">*</span></span></div>
+      <input type="text" id="hdr2" oninput="liveIn(this,'e-hdr2')">
+      <div class="ferr" id="e-hdr2"></div>
+    </div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">ＤＭヘッダー３<span class="req">*</span></span></div>
+      <input type="text" id="hdr3" oninput="liveIn(this,'e-hdr3')">
+      <div class="ferr" id="e-hdr3"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-sec">フッター（3種）</div>
+    <div class="row">
+      <div class="row-label">
+        <span class="lbl">ＤＭフッター１<span class="req">*</span></span>
+        <button class="hbtn" onclick="openPop('ＤＭフッター１','ＤＭフッター１')">?</button>
+      </div>
+      <input type="text" id="ftr1" oninput="liveIn(this,'e-ftr1')">
+      <div class="ferr" id="e-ftr1"></div>
+    </div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">ＤＭフッター２<span class="req">*</span></span></div>
+      <input type="text" id="ftr2" oninput="liveIn(this,'e-ftr2')">
+      <div class="ferr" id="e-ftr2"></div>
+    </div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">ＤＭフッター３<span class="req">*</span></span></div>
+      <input type="text" id="ftr3" oninput="liveIn(this,'e-ftr3')">
+      <div class="ferr" id="e-ftr3"></div>
+    </div>
+  </div>
+
+  <button class="save-btn" onclick="saveDM()">保存</button>
+</div>
+
+<!-- ========== タブバー ========== -->
+<nav class="tabs" id="tabs" style="display:none">
+  <button class="tab active" onclick="switchTab('settings',this)">
+    <span class="ico">⚙️</span>設定
+  </button>
+  <button class="tab" onclick="switchTab('posts',this)">
+    <span class="ico">✉️</span>ポスト
+  </button>
+  <button class="tab" onclick="switchTab('dm',this)">
+    <span class="ico">💬</span>DM
+  </button>
+</nav>
+
+<div class="toast tok" id="t-ok"></div>
+<div class="toast tng" id="t-ng"></div>
+
+<script>
+// ===== キーマッピング =====
+var KEY_MAP = {
+  '対象ポストURL'    : 'postUrl',
+  '応募キーワード'   : 'keyword',
+  '先着人数'         : 'winnerCount',
+  '落選リプライ上限' : 'loserLimit',
+  'リセット時刻'     : 'resetHour',
+  'DMQR'             : '_qr',
+  '当選リプライ'     : 'winReply',
+  '落選リプライ'     : 'loseReply',
+  '終了ポスト'       : 'endPost',
+  'フォロー要求'     : 'followRequest',
+  'ＤＭ本文１'       : 'dm1',
+  'ＤＭ本文２'       : 'dm2',
+  'ＤＭ本文３'       : 'dm3',
+  'ＤＭヘッダー１'   : 'hdr1',
+  'ＤＭヘッダー２'   : 'hdr2',
+  'ＤＭヘッダー３'   : 'hdr3',
+  'ＤＭフッター１'   : 'ftr1',
+  'ＤＭフッター２'   : 'ftr2',
+  'ＤＭフッター３'   : 'ftr3',
+};
+
+var _helpData = {};
+
+// ===== 初期化 =====
+window.addEventListener('load', function() {
+  // GAS_URL未設定チェック
+  if (!GAS_URL || GAS_URL.indexOf('ここに') !== -1) {
+    document.getElementById('url-banner').style.display = 'block';
+    hideLoading();
+    return;
+  }
+  fetch(GAS_URL)
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if (res.ok) onLoaded(res.data);
+      else { showNg('読み込み失敗: ' + res.message); hideLoading(); }
+    })
+    .catch(function(e){ showNg('通信エラー: ' + e.message); hideLoading(); });
+});
+
+function onLoaded(data) {
+  var vals = data.values || {};
+  var help = data.help  || {};
+  _helpData = help;
+
+  Object.keys(KEY_MAP).forEach(function(key) {
+    var fid = KEY_MAP[key];
+    var val = vals[key] !== undefined ? vals[key] : '';
+    if (fid === '_qr') {
+      var lines = val.split('\n');
+      setVal('qr1', lines[0] || '');
+      setVal('qr2', lines[1] || '');
+      setVal('qr3', lines[2] || '');
+    } else {
+      setVal(fid, val);
+    }
+  });
+  hideLoading();
+}
+
+function hideLoading() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('tabs').style.display    = 'flex';
+  document.querySelectorAll('.panel').forEach(function(p){ p.style.display = 'block'; });
+  document.querySelectorAll('.panel:not(.active)').forEach(function(p){ p.style.display = 'none'; });
+}
+
+function setVal(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+// ===== タブ切替 =====
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.style.display = 'none'; p.classList.remove('active'); });
+  btn.classList.add('active');
+  var panel = document.getElementById('panel-' + name);
+  panel.style.display = 'block';
+  panel.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ===== ヘルプモーダル =====
+function openPop(label, helpKey) {
+  var text = _helpData[helpKey] || _helpData[label] || '';
+  document.getElementById('pop-title').textContent = label;
+  document.getElementById('pop-body').textContent  = text || '説明がありません';
+  document.getElementById('pop-overlay').classList.add('show');
+}
+function closePop(e) {
+  if (e && e.target !== document.getElementById('pop-overlay') && !e.target.classList.contains('pop-close')) return;
+  document.getElementById('pop-overlay').classList.remove('show');
+}
+
+// ===== URL検知 =====
+var URL_PAT = [
+  /https?:\/\//i,
+  /ttp:\/\//i,
+  /[a-zA-Z0-9\-]+\.(com|net|org|jp|io|co|me|link|ly|app|tv|gg|xyz|club|site|online|shop|info|biz|us|uk|de|fr|au|ca|in|ru)(\/[^\s　]*)?(?=[\s　,、。）\)」』\n]|$)/i,
+  /bit\.ly|t\.co|youtu\.be|lin\.ee|liff\.line\.me|tinyurl|ow\.ly/i,
+];
+function detectUrl(text) {
+  for (var i = 0; i < URL_PAT.length; i++) {
+    var m = text.match(URL_PAT[i]);
+    if (m) return m[0];
+  }
+  return null;
+}
+
+// ===== バリデーション =====
+function liveTA(el, eid) {
+  var hit = detectUrl(el.value);
+  if (hit)                   markErr(el, eid, 'URLが含まれています：「' + hit + '」');
+  else if (!el.value.trim()) markErr(el, eid, '入力してください');
+  else                       clearErr(el, eid);
+}
+function liveIn(el, eid) { liveTA(el, eid); }
+
+function markErr(el, eid, msg) {
+  el.classList.add('err');
+  var e = document.getElementById(eid);
+  if (e) { e.textContent = msg; e.classList.add('show'); }
+}
+function clearErr(el, eid) {
+  if (el.value.trim()) {
+    el.classList.remove('err');
+    var e = document.getElementById(eid);
+    if (e) e.classList.remove('show');
+  }
+}
+function validateRequired(specs) {
+  var ok = true;
+  specs.forEach(function(s) {
+    var el = document.getElementById(s.id);
+    if (!el) return;
+    if (!el.value.trim()) { markErr(el, s.eid, '入力してください'); ok = false; }
+  });
+  return ok;
+}
+function validateNoUrl(ids) {
+  var first = null;
+  ids.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var hit = detectUrl(el.value);
+    if (hit) {
+      markErr(el, 'e-' + id, 'URLが含まれています：「' + hit + '」');
+      if (!first) first = id;
+    }
+  });
+  return first;
+}
+
+// ===== コピー =====
+function copyFrom(srcId, dstId, eid) {
+  var dst = document.getElementById(dstId);
+  dst.value = document.getElementById(srcId).value;
+  liveTA(dst, eid);
+  showOk('コピーしました');
+}
+
+// ===== トースト =====
+function showOk(msg) { toast('t-ok', msg); }
+function showNg(msg) { toast('t-ng', msg); }
+function toast(id, msg) {
+  var t = document.getElementById(id);
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, id === 't-ng' ? 2800 : 1800);
+}
+
+function v(id) { var el = document.getElementById(id); return el ? el.value : ''; }
+
+// ===== GASへ保存（fetch POST） =====
+function runSave(updates, label) {
+  var btns = document.querySelectorAll('.save-btn');
+  btns.forEach(function(b){ b.disabled = true; });
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' }, // GASはapplication/jsonをリジェクトする場合があるためtext/plain
+    body: JSON.stringify({ updates: updates })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    btns.forEach(function(b){ b.disabled = false; });
+    if (res.ok) showOk(label + 'を保存しました（' + res.updated.length + '項目）');
+    else showNg('保存失敗: ' + (res.message || '不明なエラー'));
+  })
+  .catch(function(e){
+    btns.forEach(function(b){ b.disabled = false; });
+    showNg('通信エラー: ' + e.message);
+  });
+}
+
+// ===== 各タブの保存処理 =====
+function saveSettings() {
+  var req = [
+    {id:'postUrl',eid:'e-postUrl'},{id:'keyword',eid:'e-keyword'},
+    {id:'winnerCount',eid:'e-winner'},{id:'loserLimit',eid:'e-loser'},{id:'resetHour',eid:'e-reset'},
+  ];
+  if (!validateRequired(req)) { showNg('必須項目を入力してください'); return; }
+  var rh = parseInt(v('resetHour'));
+  if (isNaN(rh) || rh < 0 || rh > 23) {
+    markErr(document.getElementById('resetHour'), 'e-reset', '0〜23で入力してください');
+    showNg('リセット時刻は0〜23で入力してください'); return;
+  }
+  var qr = [v('qr1'), v('qr2'), v('qr3')].filter(Boolean).join('\n');
+  runSave({
+    '対象ポストURL'    : v('postUrl'),
+    '応募キーワード'   : v('keyword'),
+    '先着人数'         : v('winnerCount'),
+    '落選リプライ上限' : v('loserLimit'),
+    'リセット時刻'     : v('resetHour'),
+    'DMQR'             : qr,
+  }, '設定');
+}
+
+function savePosts() {
+  var req = [
+    {id:'winReply',eid:'e-winReply'},{id:'loseReply',eid:'e-loseReply'},
+    {id:'endPost',eid:'e-endPost'},{id:'followRequest',eid:'e-followR'},
+  ];
+  if (!validateRequired(req)) { showNg('必須項目を入力してください'); return; }
+  var hitId = validateNoUrl(['winReply','loseReply','endPost','followRequest']);
+  if (hitId) { showNg('URLが含まれています — 保存できません'); document.getElementById(hitId).focus(); return; }
+  runSave({
+    '当選リプライ' : v('winReply'),
+    '落選リプライ' : v('loseReply'),
+    '終了ポスト'   : v('endPost'),
+    'フォロー要求' : v('followRequest'),
+  }, 'ポスト設定');
+}
+
+function saveDM() {
+  var reqIds = [
+    {id:'dm1',eid:'e-dm1'},
+    {id:'hdr1',eid:'e-hdr1'},{id:'hdr2',eid:'e-hdr2'},{id:'hdr3',eid:'e-hdr3'},
+    {id:'ftr1',eid:'e-ftr1'},{id:'ftr2',eid:'e-ftr2'},{id:'ftr3',eid:'e-ftr3'},
+  ];
+  if (!validateRequired(reqIds)) { showNg('必須項目を入力してください'); return; }
+  var hitId = validateNoUrl(['dm1','dm2','dm3','hdr1','hdr2','hdr3','ftr1','ftr2','ftr3']);
+  if (hitId) { showNg('URLが含まれています — 保存できません'); document.getElementById(hitId).focus(); return; }
+  runSave({
+    'ＤＭ本文１'     : v('dm1'),
+    'ＤＭ本文２'     : v('dm2'),
+    'ＤＭ本文３'     : v('dm3'),
+    'ＤＭヘッダー１' : v('hdr1'),
+    'ＤＭヘッダー２' : v('hdr2'),
+    'ＤＭヘッダー３' : v('hdr3'),
+    'ＤＭフッター１' : v('ftr1'),
+    'ＤＭフッター２' : v('ftr2'),
+    'ＤＭフッター３' : v('ftr3'),
+  }, 'DM設定');
+}
+</script>
+</body>
+</html>
