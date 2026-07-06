@@ -211,12 +211,23 @@ var GAS_URL = '__GAS_URL__';  // GitHub Actionsが置換
       <div class="ferr" id="e-postUrl">入力してください</div>
     </div>
     <div class="row">
-      <div class="row-label">
-        <span class="lbl">応募キーワード<span class="req">*</span></span>
-        <button class="hbtn" onclick="openPop('応募キーワード','応募キーワード')">?</button>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px">
+        <div>
+          <div class="row-label">
+            <span class="lbl" style="font-size:12px">応募キーワード<span class="req">*</span></span>
+            <button class="hbtn" onclick="openPop('応募キーワード','応募キーワード')" style="width:17px;height:17px;font-size:10px">?</button>
+          </div>
+          <input type="text" id="keyword" oninput="clearErr(this,'e-keyword')">
+          <div class="ferr" id="e-keyword">入力してください</div>
+        </div>
+        <div>
+          <div class="row-label">
+            <span class="lbl" style="font-size:12px">敬称</span>
+            <button class="hbtn" onclick="openPop('敬称','敬称')" style="width:17px;height:17px;font-size:10px">?</button>
+          </div>
+          <input type="text" id="honorific" placeholder="さん">
+        </div>
       </div>
-      <input type="text" id="keyword" oninput="clearErr(this,'e-keyword')">
-      <div class="ferr" id="e-keyword">入力してください</div>
     </div>
     <div class="row">
       <div class="row3">
@@ -412,6 +423,7 @@ var _helpData = {};
 var KEY_MAP = {
   '対象ポストURL'    : 'postUrl',
   '応募キーワード'   : 'keyword',
+  '敬称'             : 'honorific',
   '先着人数'         : 'winnerCount',
   '落選リプライ上限' : 'loserLimit',
   'リセット時刻'     : 'resetHour',
