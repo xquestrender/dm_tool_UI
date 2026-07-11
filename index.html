@@ -19,7 +19,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulati
 html,body{height:100%;overflow-x:hidden}
 body{font-family:var(--font);background:var(--bg2);color:var(--text);font-size:16px}
 
-/* ====== ログイン画面 ===== */
+/* ===== ログイン画面 ===== */
 #login-screen{
   position:fixed;inset:0;background:var(--bg2);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -277,6 +277,26 @@ var GAS_URL = '__GAS_URL__';  // GitHub Actionsが置換
     </div>
   </div>
   <button class="save-btn" onclick="saveSettings()">保存</button>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-sec">パスワード変更</div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">現在のパスワード</span></div>
+      <input type="password" id="pw-old" autocomplete="current-password">
+    </div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">新しいパスワード</span></div>
+      <input type="password" id="pw-new" autocomplete="new-password">
+    </div>
+    <div class="row">
+      <div class="row-label"><span class="lbl">新しいパスワード（確認）</span></div>
+      <input type="password" id="pw-new2" autocomplete="new-password">
+      <div class="ferr" id="e-pw"></div>
+    </div>
+    <div style="padding:0 16px 16px">
+      <button class="save-btn" style="margin-top:8px" onclick="doChangePassword()">パスワードを変更</button>
+    </div>
+  </div>
 </div>
 
 <!-- ========== ポストパネル ========== -->
@@ -416,6 +436,20 @@ var GAS_URL = '__GAS_URL__';  // GitHub Actionsが置換
 <div class="toast tng" id="t-ng"></div>
 
 <script>
+// ===== 環境判定 =====
+// GAS WebApp版は起動時にログインをスキップしてそのままデータ読み込み
+window.addEventListener('load', function(){
+  var isGas = (typeof google !== 'undefined' && typeof google.script !== 'undefined');
+  if (isGas) {
+    document.getElementById('login-screen').style.display = 'none';
+    loadData();
+  }
+});
+
+// ===== 環境判定 =====
+// GAS WebApp内ならgoogle.script.runを使う、GitHub Pagesならfetchを使う
+var IS_GAS = (typeof google !== 'undefined' && typeof google.script !== 'undefined');
+
 // ===== 状態 =====
 var _pw      = '';
 var _helpData = {};
@@ -451,35 +485,69 @@ function doLogin() {
   if (!pw) { err.textContent = 'パスワードを入力してください'; return; }
   btn.disabled = true;
   err.textContent = '';
-  fetch(GAS_URL + '?action=auth&pw=' + encodeURIComponent(pw))
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      if (res.ok) {
-        _pw = pw;
-        document.getElementById('login-screen').style.display = 'none';
-        loadData();
-      } else {
-        err.textContent = res.message || 'パスワードが違います';
-        document.getElementById('pw-input').classList.add('err');
+
+  if (IS_GAS) {
+    // GAS WebApp版：google.script.runで直接照合
+    google.script.run
+      .withSuccessHandler(function(res){
+        if (res.ok) {
+          _pw = pw;
+          document.getElementById('login-screen').style.display = 'none';
+          loadData();
+        } else {
+          err.textContent = res.message || 'パスワードが違います';
+          document.getElementById('pw-input').classList.add('err');
+          btn.disabled = false;
+        }
+      })
+      .withFailureHandler(function(e){
+        err.textContent = 'エラー: ' + e.message;
         btn.disabled = false;
-      }
-    })
-    .catch(function(e){
-      err.textContent = '通信エラー: ' + e.message;
-      btn.disabled = false;
-    });
+      })
+      .verifyPasswordClient(pw);
+  } else {
+    // GitHub Pages版：fetchで照合
+    fetch(GAS_URL + '?action=auth&pw=' + encodeURIComponent(pw))
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (res.ok) {
+          _pw = pw;
+          document.getElementById('login-screen').style.display = 'none';
+          loadData();
+        } else {
+          err.textContent = res.message || 'パスワードが違います';
+          document.getElementById('pw-input').classList.add('err');
+          btn.disabled = false;
+        }
+      })
+      .catch(function(e){
+        err.textContent = '通信エラー: ' + e.message;
+        btn.disabled = false;
+      });
+  }
 }
 
 // ===== データ読み込み =====
 function loadData() {
   document.getElementById('loading').style.display = 'flex';
-  fetch(GAS_URL + '?action=load&pw=' + encodeURIComponent(_pw))
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      if (res.ok) onLoaded(res.data);
-      else { showNg('読み込み失敗: ' + res.message); hideLoading(); }
-    })
-    .catch(function(e){ showNg('通信エラー: ' + e.message); hideLoading(); });
+  if (IS_GAS) {
+    google.script.run
+      .withSuccessHandler(function(res){
+        // getSettings()は{values,help}を直接返す
+        if (res && res.values) onLoaded(res);
+        else { showNg('読み込み失敗'); hideLoading(); }
+      })
+      .withFailureHandler(function(e){ showNg('通信エラー: ' + e.message); hideLoading(); })
+      .getSettings();
+  } else {
+    fetch(GAS_URL + '?action=load&pw=' + encodeURIComponent(_pw))
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (res.ok) onLoaded(res.data);
+        else { showNg('読み込み失敗: ' + res.message); hideLoading(); }
+      })
+      .catch(function(e){ showNg('通信エラー: ' + e.message); hideLoading(); });
+  }
 }
 
 function onLoaded(data) {
@@ -600,10 +668,74 @@ function toast(id,msg){
 }
 function v(id){var el=document.getElementById(id);return el?el.value:'';}
 
+// ===== パスワード変更 =====
+function doChangePassword() {
+  var oldPw = document.getElementById('pw-old').value.trim();
+  var newPw  = document.getElementById('pw-new').value.trim();
+  var newPw2 = document.getElementById('pw-new2').value.trim();
+  var errEl  = document.getElementById('e-pw');
+
+  errEl.classList.remove('show');
+  if (!oldPw || !newPw || !newPw2) { errEl.textContent='すべて入力してください'; errEl.classList.add('show'); return; }
+  if (newPw !== newPw2) { errEl.textContent='新しいパスワードが一致しません'; errEl.classList.add('show'); return; }
+
+  if (IS_GAS) {
+    google.script.run
+      .withSuccessHandler(function(res){
+        if (res.ok) {
+          showOk('パスワードを変更しました');
+          _pw = newPw;
+          document.getElementById('pw-old').value='';
+          document.getElementById('pw-new').value='';
+          document.getElementById('pw-new2').value='';
+        } else {
+          errEl.textContent = res.message || '変更失敗';
+          errEl.classList.add('show');
+        }
+      })
+      .withFailureHandler(function(e){ errEl.textContent='エラー: '+e.message; errEl.classList.add('show'); })
+      .changePasswordClient(oldPw, newPw);
+  } else {
+    fetch(GAS_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'change_password', pw:oldPw, newPw:newPw})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if (res.ok) {
+        showOk('パスワードを変更しました');
+        _pw = newPw;
+        document.getElementById('pw-old').value='';
+        document.getElementById('pw-new').value='';
+        document.getElementById('pw-new2').value='';
+      } else {
+        errEl.textContent = res.message || '変更失敗';
+        errEl.classList.add('show');
+      }
+    })
+    .catch(function(e){ errEl.textContent='通信エラー: '+e.message; errEl.classList.add('show'); });
+  }
+}
+
 // ===== GASへ保存 =====
 function runSave(updates,label){
   var btns=document.querySelectorAll('.save-btn');
   btns.forEach(function(b){b.disabled=true;});
+  if (IS_GAS) {
+    google.script.run
+      .withSuccessHandler(function(res){
+        btns.forEach(function(b){b.disabled=false;});
+        if(res.ok) showOk(label+'を保存しました（'+res.updated.length+'項目）');
+        else showNg('保存失敗: '+(res.message||'不明なエラー'));
+      })
+      .withFailureHandler(function(e){
+        btns.forEach(function(b){b.disabled=false;});
+        showNg('通信エラー: '+e.message);
+      })
+      .saveSettings(updates);
+    return;
+  }
   fetch(GAS_URL,{
     method:'POST',
     headers:{'Content-Type':'text/plain'},
